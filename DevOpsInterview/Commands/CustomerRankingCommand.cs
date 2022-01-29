@@ -8,8 +8,13 @@ namespace DevOpsInterview.Commands
 {
     public class CustomerRankingCommand : Command
     {
-        public CustomerRankingCommand() : base("CustomerRanking")
+        private readonly ICsvIoService _csvIoService;
+        private readonly ICustomerRankingService _customerRankingService;
+        
+        public CustomerRankingCommand(ICsvIoService csvIoService, ICustomerRankingService customerRankingService) : base("CustomerRanking")
         {
+            _csvIoService = csvIoService;
+            _customerRankingService = customerRankingService;
             var ordersCsvFilePathOption = new Option<string>(
                 "--orders-csv-file-path",
                 "Orders CSV file path")
@@ -49,21 +54,19 @@ namespace DevOpsInterview.Commands
                 outputFilePathOption);
         }
 
-        private new static void Handler(
+        private new void Handler(
             string ordersCsvFilePath, 
             string productsCsvFilePath, 
             string customersCsvFilePath, 
             string outputFilePath)
         {
-            var csvIoService = new CsvIoService();
+            var orders = _csvIoService.Load<Order, OrderClassMap>(ordersCsvFilePath);
+            var products = _csvIoService.Load<Product, ProductClassMap>(productsCsvFilePath);
+            var customers = _csvIoService.Load<Customer, CustomerClassMap>(customersCsvFilePath);
 
-            var orders = csvIoService.Load<Order, OrderClassMap>(ordersCsvFilePath);
-            var products = csvIoService.Load<Product, ProductClassMap>(productsCsvFilePath);
-            var customers = csvIoService.Load<Customer, CustomerClassMap>(customersCsvFilePath);
+            var customerRankings = _customerRankingService.Compute(orders, products, customers);
 
-            var customerRankings = new CustomerRankingService().Compute(orders, products, customers);
-
-            csvIoService.Save<CustomerRanking, CustomerRankingClassMap>(outputFilePath, customerRankings);
+            _csvIoService.Save<CustomerRanking, CustomerRankingClassMap>(outputFilePath, customerRankings);
         }
     }
 }

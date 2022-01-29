@@ -1,4 +1,3 @@
-using System;
 using System.CommandLine;
 using DevOpsInterview.Configuration;
 using DevOpsInterview.Configuration.Csv;
@@ -9,15 +8,20 @@ namespace DevOpsInterview.Commands
 {
     public class ProductCustomersCommand : Command
     {
-        public ProductCustomersCommand() : base("ProductCustomers")
+        private readonly ICsvIoService _csvIoService;
+        private readonly IProductCustomersService _productCustomersService;
+
+        public ProductCustomersCommand(ICsvIoService csvIoService, IProductCustomersService productCustomersService) : base("ProductCustomers")
         {
+            _csvIoService = csvIoService;
+            _productCustomersService = productCustomersService;
             var ordersCsvFilePathOption = new Option<string>(
                 "--orders-csv-file-path",
                 "Orders CSV file path")
             {
                 IsRequired = true
             };
-            
+
             var productsCsvFilePathOption = new Option<string>(
                 "--products-csv-file-path",
                 "Orders CSV file path")
@@ -41,16 +45,14 @@ namespace DevOpsInterview.Commands
                 outputFilePathOption);
         }
 
-        private new static void Handler(string ordersCsvFilePath, string productsCsvFilePath, string outputFilePath)
+        private new void Handler(string ordersCsvFilePath, string productsCsvFilePath, string outputFilePath)
         {
-            var csvIoService = new CsvIoService();
+            var orders = _csvIoService.Load<Order, OrderClassMap>(ordersCsvFilePath);
+            var products = _csvIoService.Load<Product, ProductClassMap>(productsCsvFilePath);
 
-            var orders = csvIoService.Load<Order, OrderClassMap>(ordersCsvFilePath);
-            var products = csvIoService.Load<Product, ProductClassMap>(productsCsvFilePath);
+            var productCustomers = _productCustomersService.Compute(orders, products);
 
-            var productCustomers = new ProductCustomersService().Compute(orders, products);
-
-            csvIoService.Save<ProductCustomer, ProductCustomerClassMap>(outputFilePath, productCustomers);
+            _csvIoService.Save<ProductCustomer, ProductCustomerClassMap>(outputFilePath, productCustomers);
         }
     }
 }

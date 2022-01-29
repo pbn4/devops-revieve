@@ -5,7 +5,12 @@ using DevOpsInterview.Models;
 
 namespace DevOpsInterview.Services
 {
-    public class ProductCustomersService
+    public interface IProductCustomersService
+    {
+        public IList<ProductCustomer> Compute(IList<Order> orders, IList<Product> products);
+    }
+    
+    public class ProductCustomersService : IProductCustomersService
     {
         public IList<ProductCustomer> Compute(IList<Order> orders, IList<Product> products)
         {

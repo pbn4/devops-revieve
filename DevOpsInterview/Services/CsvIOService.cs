@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -10,7 +8,13 @@ using DevOpsInterview.Configuration;
 
 namespace DevOpsInterview.Services
 {
-    public class CsvIoService
+    public interface ICsvIoService
+    {
+        public IList<TClass> Load<TClass, TClassMap>(string filePath) where TClassMap : ClassMap<TClass>;
+        public void Save<TClass, TClassMap>(string filePath, IEnumerable<TClass> records) where TClassMap : ClassMap<TClass>;
+    }
+
+    public class CsvIoService : ICsvIoService
     {
         public IList<TClass> Load<TClass, TClassMap>(string filePath) where TClassMap : ClassMap<TClass>
         {

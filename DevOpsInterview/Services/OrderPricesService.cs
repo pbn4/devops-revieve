@@ -5,7 +5,12 @@ using DevOpsInterview.Utils.ExtensionMethods;
 
 namespace DevOpsInterview.Services
 {
-    public class OrderPricesService
+    public interface IOrderPricesService
+    {
+        public IList<OrderPrice> Compute(IList<Order> orders, IList<Product> products);
+    }
+    
+    public class OrderPricesService : IOrderPricesService
     {
         public IList<OrderPrice> Compute(IList<Order> orders, IList<Product> products)
         {
