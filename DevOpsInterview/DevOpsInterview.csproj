@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+
+        <IsPackable>false</IsPackable>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <OutputType>Exe</OutputType>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="System.CommandLine" Version="2.0.0-beta2.21617.1" />
+        <PackageReference Include="CsvHelper" Version="27.2.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Utils" />
+    </ItemGroup>
+</Project>
